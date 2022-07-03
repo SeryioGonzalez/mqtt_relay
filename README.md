@@ -1,1 +1,1 @@
-# mqtt_relay
+# MQTT Relay IoT Edge module 
