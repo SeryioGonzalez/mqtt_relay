@@ -7,14 +7,15 @@ import sys
 import threading
 from azure.iot.device import IoTHubModuleClient
 
+log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
+logging.basicConfig(level=log_level)
+
 default_iot_edge_output_name = 'output1'
 default_mqtt_topic="/{}/{}".format( os.environ.get("IOTEDGE_DEVICEID"), os.environ.get("IOTEDGE_MODULEID"))
 default_mqtt_port=1883
 
-log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
-logging.basicConfig(level=log_level)
-
 iot_edge_output_name = os.environ.get("OUTPUT_NAME", default_iot_edge_output_name)
+
 mqtt_topic = os.environ.get("MQTT_TOPIC", default_mqtt_topic)
 mqtt_client_name="{}@{}".format( os.environ.get("IOTEDGE_MODULEID"), os.environ.get("IOTEDGE_DEVICEID"))
 mqtt_broker_fqdn=os.environ.get("MQTT_BROKER_FQDN")
