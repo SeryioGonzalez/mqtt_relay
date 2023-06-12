@@ -11,15 +11,16 @@ log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
 logging.basicConfig(level=log_level)
 
 default_iot_edge_output_name = 'output1'
-default_mqtt_topic="/{}/{}".format( os.environ.get("IOTEDGE_DEVICEID"), os.environ.get("IOTEDGE_MODULEID"))
-default_mqtt_port=1883
+default_mqtt_topic = "/{}/{}".format( os.environ.get("IOTEDGE_DEVICEID"), os.environ.get("IOTEDGE_MODULEID"))
+default_mqtt_port = 1883
 
 iot_edge_output_name = os.environ.get("OUTPUT_NAME", default_iot_edge_output_name)
 
-mqtt_topic = os.environ.get("MQTT_TOPIC", default_mqtt_topic)
-mqtt_client_name="{}@{}".format( os.environ.get("IOTEDGE_MODULEID"), os.environ.get("IOTEDGE_DEVICEID"))
-mqtt_broker_fqdn=os.environ.get("MQTT_BROKER_FQDN")
-mqtt_broker_port=os.environ.get("MQTT_BROKER_PORT", default_mqtt_port)
+DESTINATION_MQTT_TOPIC       = os.environ.get("DESTINATION_MQTT_TOPIC", default_mqtt_topic)
+DESTINATION_MQTT_BROKER_FQDN = os.environ.get("DESTINATION_MQTT_BROKER_FQDN")
+DESTINATION_MQTT_BROKER_PORT = os.environ.get("DESTINATION_MQTT_BROKER_PORT", default_mqtt_port)
+
+MQTT_CLIENT_NAME = "{}@{}".format( os.environ.get("IOTEDGE_MODULEID"), os.environ.get("IOTEDGE_DEVICEID"))
 
 def process_input_message(input_message):
     logging.info("INPUT - Preprocessing incoming message")
@@ -33,10 +34,10 @@ def process_input_message(input_message):
     return output_data
 
 def init_mqtt_client():
-    logging.info("INIT - Connecting MQTT CLIENT {} to MQTT BROKER {} ON PORT {}".format(mqtt_client_name, mqtt_broker_fqdn, mqtt_broker_port))
-    mqtt_client = paho.Client(mqtt_client_name)   
+    logging.info("INIT - Connecting MQTT CLIENT {} to MQTT BROKER {} ON PORT {}".format(MQTT_CLIENT_NAME, DESTINATION_MQTT_BROKER_FQDN, DESTINATION_MQTT_BROKER_PORT))
+    mqtt_client = paho.Client(MQTT_CLIENT_NAME)   
     mqtt_client.on_publish = publish_message_to_mqtt_broker
-    mqtt_client.connect(mqtt_broker_fqdn, mqtt_broker_port)  
+    mqtt_client.connect(DESTINATION_MQTT_BROKER_FQDN, DESTINATION_MQTT_BROKER_PORT)  
 
     return mqtt_client
 
@@ -59,8 +60,8 @@ def init_iot_edge_module():
         iot_edge_client.send_message_to_output(str(output_message), iot_edge_output_name)
 
         #SENDING IT TO MQTT BROKER
-        logging.info("MQTT - Publishing message to topic {}".format(mqtt_topic))
-        mqtt_client.publish(mqtt_topic, str(output_message) )
+        logging.info("MQTT - Publishing message to topic {}".format(DESTINATION_MQTT_TOPIC))
+        mqtt_client.publish(DESTINATION_MQTT_TOPIC, str(output_message) )
         logging.info("MQTT - Published message")
 
     try:
